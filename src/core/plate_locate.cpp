@@ -1555,6 +1555,12 @@ int CPlateLocate::plateLocate(Mat src, vector<Mat>& resultVec, int index)
 	//imshow("dst_blue",dst_blue);
 	Mat element_blue = getStructuringElement(MORPH_ELLIPSE, Size(10, 10));
 	morphologyEx(dst_blue, dst_blue, MORPH_CLOSE, element_blue);
+	if (m_debug)
+	{
+		stringstream ss(stringstream::in | stringstream::out);
+		ss << "image/tmp/morphologyEx" << ".jpg";
+		imwrite(ss.str(), dst_blue);
+	}
 	//Find ÂÖÀª of possibles plates
 	cv::Mat con_blue = dst_blue.clone();
 	vector< vector< Point> > contours_blue;
@@ -1570,6 +1576,10 @@ int CPlateLocate::plateLocate(Mat src, vector<Mat>& resultVec, int index)
 	vector<cv::Rect> rects_blue;
 	while (itb != contours_blue.end())
 	{
+		if (itb->size() < 50) {
+			itb++;
+			continue;
+		}
 		//Create bounding rect of object
 		RotatedRect mr = minAreaRect(Mat(*itb));
 
@@ -1640,7 +1650,7 @@ int CPlateLocate::plateLocate(Mat src, vector<Mat>& resultVec, int index)
 		{
 			cv::Mat roi = dst_yellow(safeBoundRect);
 			roi.setTo(0);
-            cv::swap(roi, dst_yellow);
+            //cv::swap(roi, dst_yellow);
 		}
 		else
 		{
